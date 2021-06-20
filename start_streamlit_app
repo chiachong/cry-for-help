@@ -1,0 +1,2 @@
+source ./activate
+streamlit run ./srcs/streamlit_app/app.py

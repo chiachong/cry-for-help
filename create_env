@@ -1,0 +1,4 @@
+python3.7 -m venv env
+source env/bin/activate
+pip3 install --upgrade pip setuptools
+pip3 install --upgrade -r requirements.txt

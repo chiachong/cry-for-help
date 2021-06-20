@@ -1,0 +1,7 @@
+flask==1.1.2
+flask-cors==3.0.10
+flask-restful==0.3.8
+numpy==1.18.2
+pandas==0.25.3
+pyyaml==5.3.1
+streamlit==0.80.0
