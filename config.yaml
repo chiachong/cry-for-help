@@ -4,5 +4,7 @@ API_ADDRESS: 'http://127.0.0.1:5000'
 
 API_ENDPOINTS:
     LOAD_PROJECTS: '/api/v1/projects'
-    CREATE_PROJECT: '/api/v1/projects'
-    DELETE_PROJECT: '/api/v1/projects/delete'
+    CREATE_PROJECT: '/api/v1/project'
+    DELETE_PROJECT: '/api/v1/project/delete'
+    GET_DATA: '/api/v1/data/project'
+    GET_PROJECT_INFO: '/api/v1/project/info'
