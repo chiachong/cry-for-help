@@ -1,4 +1,6 @@
 import os
+import copy
+import json
 import yaml
 import requests
 import pandas as pd
@@ -53,6 +55,31 @@ def load_projects(url: str = None) -> List[str]:
 
     r = requests.get(url)
     return r.json()['projects']
+
+
+def update_project_info(project_name: str, project_info: dict, new_label: str,
+                        new_description: str, add_label: bool,
+                        add_description: bool, url: str = None):
+    """ Update project description and labels. """
+    headers = {
+        'content-type': 'application/json',
+        'Accept-Charset': 'UTF-8',
+    }
+    if url is None:
+        url = os.environ['API_ADDRESS'] + os.environ['UPDATE_PROJECT_INFO']
+
+    url = f'{url}/{project_name}'
+    new_project_info = copy.deepcopy(project_info)
+    if add_label and new_label not in project_info['label']:
+        new_project_info['label'].append(new_label)
+
+    if add_description and new_description != project_info['description']:
+        new_project_info['description'] = new_description
+
+    if new_project_info['label'] != project_info['label'] or \
+        new_project_info['description'] != project_info['description']:
+        r = requests.post(url, data=json.dumps(new_project_info), headers=headers)
+        rerun()
 
 
 def rerun():

@@ -38,9 +38,19 @@ def main():
         with right_column:
             st.header(current_project)
             st.write(templates.create_date_html(create_date), unsafe_allow_html=True)
+            # project description text box height if the description is changed
             text_area_height = (len(description) + 42 - 1) // 42 * 30
             new_description = st.text_area('', value=description, height=text_area_height)
+            add_description = False
+            # display a button to save new project description
+            if new_description != description:
+                add_description = st.button('Save', key='button_save_description')
+
             new_label, add_label = widgets.add_and_display_label(labels)
+            # update description and labels
+            app_utils.update_project_info(current_project, project_info, new_label,
+                                          new_description, add_label, add_description)
+
 
 
 if __name__ == '__main__':
