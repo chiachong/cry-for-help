@@ -25,6 +25,16 @@ def delete_project(project_name: str, url: str = None):
     r = requests.delete(url)
 
 
+def get_project_info(project_name: str, url: str = None):
+    """ Get information of the given project. """
+    if url is None:
+        url = os.environ['API_ADDRESS'] + os.environ['GET_PROJECT_INFO']
+
+    url = f'{url}/{project_name}'
+    r = requests.get(url)
+    return r.json()
+
+
 @st.cache(show_spinner=False)
 def load_config(config: str) -> dict:
     """ Load project configurations from a .yaml file. """

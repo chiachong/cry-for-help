@@ -17,6 +17,22 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 api = Api(app)
 
 
+@app.route(f'{API_ENDPOINTS["GET_PROJECT_INFO"]}/<project_name>', methods=['GET'])
+@cross_origin()
+def get_project_info(project_name: str):
+    """ Get and return project information in a dictionary. """
+    df = pd.read_csv(os.path.join(PROJECT_DIR, 'projects.csv'))
+    selected_df = df.loc[df.project == project_name].reset_index()
+    label = selected_df.label[0]
+    label = [] if str(label) == 'nan' else label.split(':sep:')
+    return {
+        'project': project_name,
+        'createDate': selected_df.createDate[0],
+        'description': selected_df.description[0],
+        'label': label,
+    }
+
+
 @app.route(API_ENDPOINTS['LOAD_PROJECTS'], methods=['GET'])
 @cross_origin()
 def get_all_projects():

@@ -3,7 +3,17 @@ import sys
 import streamlit as st
 from typing import List
 
-from srcs.streamlit_app import app_utils
+from srcs.streamlit_app import app_utils, templates
+
+
+def add_and_display_label(labels: List[str]):
+    """ An expander widgets to display labels and add label """
+    with st.beta_expander('Labels'):
+        label_list_html = templates.label_list_html(labels)
+        st.write(label_list_html, unsafe_allow_html=True)
+        new_label = st.text_input('Define new label:')
+        _add = st.button('Submit', key='button_submit_define_label')
+    return new_label, _add
 
 
 def add_project(projects: List[str]) -> List[str]:
