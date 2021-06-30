@@ -19,39 +19,44 @@ api = Api(app)
 
 @app.route(API_ENDPOINTS['LOAD_PROJECTS'], methods=['GET'])
 @cross_origin()
-def get_projects():
+def get_all_projects():
     """ Get and return list of projects. """
     try:
         df = pd.read_csv(os.path.join(PROJECT_DIR, 'projects.csv'))
-        projects = df.projects.to_list()
+        projects = df.project.to_list()
     except FileNotFoundError:
         projects = []
 
     return {'projects': projects}
 
 
-@app.route(f'{API_ENDPOINTS["CREATE_PROJECT"]}/<name>', methods=['PUT'])
+@app.route(f'{API_ENDPOINTS["CREATE_PROJECT"]}/<project_name>', methods=['PUT'])
 @cross_origin()
-def create_project(name):
+def create_project(project_name: str):
     """ Get and return list of projects. """
-    datetime_now = str(datetime.now()).split('.')[0]
+    to_append = {
+        'project': [project_name],
+        'createDate': [str(datetime.now()).split('.')[0]],
+        'description': ['Add description at here.'],  # default description
+        'label': None,  # default label
+    }
+    df_to_append = pd.DataFrame(to_append)
     try:
         df = pd.read_csv(os.path.join(PROJECT_DIR, 'projects.csv'))
-        to_append = {'projects': name, 'createDate': datetime_now}
-        df = df.append(to_append, ignore_index=True)
+        df = df.append(df_to_append, ignore_index=True)
     except FileNotFoundError:
-        df = pd.DataFrame({'projects': [name], 'createDate': [datetime_now]})
+        df = df_to_append
 
     df.to_csv(os.path.join(PROJECT_DIR, 'projects.csv'), index=False)
     return {'success': True}, 200, {'ContentType': 'application/json'}
 
 
-@app.route(f'{API_ENDPOINTS["DELETE_PROJECT"]}/<name>', methods=['DELETE'])
+@app.route(f'{API_ENDPOINTS["DELETE_PROJECT"]}/<project_name>', methods=['DELETE'])
 @cross_origin()
-def delete_project(name):
+def delete_project(project_name):
     """ Delete an existing project. """
     df = pd.read_csv(os.path.join(PROJECT_DIR, 'projects.csv'))
-    df = df[df['projects'] != name]
+    df = df[df['project'] != project_name]
     df.to_csv(os.path.join(PROJECT_DIR, 'projects.csv'), index=False)
     return {'success': True}, 200, {'ContentType': 'application/json'}
 
