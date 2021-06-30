@@ -8,3 +8,4 @@ API_ENDPOINTS:
     DELETE_PROJECT: '/api/v1/project/delete'
     GET_DATA: '/api/v1/data/project'
     GET_PROJECT_INFO: '/api/v1/project/info'
+    UPDATE_PROJECT_INFO: '/api/v1/project/info'

@@ -77,5 +77,20 @@ def delete_project(project_name):
     return {'success': True}, 200, {'ContentType': 'application/json'}
 
 
+@app.route(f'{API_ENDPOINTS["UPDATE_PROJECT_INFO"]}/<project_name>', methods=['POST'])
+@cross_origin()
+def update_project_info(project_name):
+    """ Update information of an existing project. """
+    new_info = request.get_json()
+    new_description = new_info['description']
+    new_label = ':sep:'.join(new_info['label'])
+    df = pd.read_csv(os.path.join(PROJECT_DIR, 'projects.csv'))
+    id = df.project == project_name
+    df.loc[id, 'description'] = new_description
+    df.loc[id, 'label'] = new_label
+    df.to_csv(os.path.join(PROJECT_DIR, 'projects.csv'), index=False)
+    return {'success': True}, 200, {'ContentType': 'application/json'}
+
+
 if __name__ == '__main__':
     app.run(debug=True)
