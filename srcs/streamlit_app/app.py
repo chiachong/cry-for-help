@@ -50,7 +50,9 @@ def main():
             # update description and labels
             app_utils.update_project_info(current_project, project_info, new_label,
                                           new_description, add_label, add_description)
-
+            # import data
+            file, add_data, text_column = widgets.import_data()
+            app_utils.add_texts(current_project, file, add_data, text_column)
 
 
 if __name__ == '__main__':

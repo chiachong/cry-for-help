@@ -10,6 +10,22 @@ from typing import List
 from srcs import utils
 
 
+def add_texts(project_name: str, df: pd.DataFrame, add_data: bool,
+              text_column: str, url: str = None):
+    """ Add text data. """
+    headers = {
+        'content-type': 'application/json',
+        'Accept-Charset': 'UTF-8',
+    }
+    if url is None:
+        url = os.environ['API_ADDRESS'] + os.environ['ADD_DATA']
+
+    url = f'{url}/{project_name}'
+    if add_data and df is not None and text_column is not None:
+        new_data = {'texts': df[text_column].to_list()}
+        r = requests.put(url, data=json.dumps(new_data), headers=headers)
+
+
 def create_project(project_name: str, url: str = None):
     """ Create a new project """
     if url is None:

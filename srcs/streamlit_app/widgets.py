@@ -1,5 +1,6 @@
 import os
 import sys
+import pandas as pd
 import streamlit as st
 from typing import List
 
@@ -45,3 +46,19 @@ def delete_project(projects: List[str]) -> List[str]:
                 app_utils.rerun()
 
             return projects
+
+
+def import_data():
+    """ An expander widget to import data. """
+    with st.beta_expander('Import data'):
+        file = st.file_uploader(label='Upload your csv file here.')
+        if file is not None:
+            df = pd.read_csv(file)
+            # select the column containing the texts to be labelled
+            column = st.selectbox('Column containing the texts', list(df.columns))
+            _add = st.button('Import', key='button_submit_add_data')
+            file = df
+        else:
+            _add, column = None, None
+
+    return file, _add, column
