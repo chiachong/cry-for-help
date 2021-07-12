@@ -1,4 +1,5 @@
 import os
+import shutil
 import pandas as pd
 from datetime import datetime
 from flask import Flask, request, jsonify, abort
@@ -15,6 +16,18 @@ os.makedirs(PROJECT_DIR, exist_ok=True)
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
 api = Api(app)
+
+
+@app.route(f'{API_ENDPOINTS["ADD_DATA"]}/<project_name>', methods=['PUT'])
+@cross_origin()
+def add_text_data(project_name: str):
+    """ Add texts to be labelled. """
+    new_data = request.get_json()
+    new_data['verified'] = [0] * len(new_data['texts'])
+    new_data['label'] = None
+    df = pd.DataFrame(new_data)
+    df.to_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'), index=False)
+    return {'success': True}, 200, {'ContentType': 'application/json'}
 
 
 @app.route(f'{API_ENDPOINTS["GET_PROJECT_INFO"]}/<project_name>', methods=['GET'])
@@ -50,6 +63,9 @@ def get_all_projects():
 @cross_origin()
 def create_project(project_name: str):
     """ Get and return list of projects. """
+    # create folder
+    os.makedirs(os.path.join(PROJECT_DIR, project_name), exist_ok=True)
+    # add project info
     to_append = {
         'project': [project_name],
         'createDate': [str(datetime.now()).split('.')[0]],
@@ -71,6 +87,9 @@ def create_project(project_name: str):
 @cross_origin()
 def delete_project(project_name):
     """ Delete an existing project. """
+    # delete folder
+    shutil.rmtree(os.path.join(PROJECT_DIR, project_name))
+    # delete project info
     df = pd.read_csv(os.path.join(PROJECT_DIR, 'projects.csv'))
     df = df[df['project'] != project_name]
     df.to_csv(os.path.join(PROJECT_DIR, 'projects.csv'), index=False)
