@@ -40,8 +40,7 @@ def get_data(project_name: str, current_page: int):
         text = df.texts.iloc[current_page]
         verified = str(df.verified.iloc[current_page])
         label = str(df.label.iloc[current_page])
-        if label == 'nan':
-            label = ''
+        label = [] if label == 'nan' else label.split(':sep:')
     except FileNotFoundError:
         total = 0
         text = None
