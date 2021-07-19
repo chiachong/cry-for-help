@@ -48,6 +48,24 @@ def delete_project(projects: List[str]) -> List[str]:
             return projects
 
 
+def label_data(labels: List[str], current_label: List[str]):
+    """ Checkboxes to label data. """
+    st.write('')  # an empty line to make spacing
+    checkboxes = []
+    for label in labels:
+        pre_checked = True if label in current_label else False
+        checkboxes.append(st.checkbox(label, pre_checked, f'label_{label}'))
+
+    # capture any changes to the label checkboxes
+    new_labels = [labels[i] for i in range(len(labels)) if checkboxes[i]]
+    # display a submit button if any label checkboxes is changed
+    if set(new_labels) != set(current_label):
+        submit = st.button('Submit', key='button_submit_label_data')
+    else:
+        submit = None
+    return new_labels, submit
+
+
 def import_data():
     """ An expander widget to import data. """
     with st.beta_expander('Import data'):

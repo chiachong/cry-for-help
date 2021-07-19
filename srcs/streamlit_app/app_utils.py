@@ -43,7 +43,6 @@ def delete_project(project_name: str, url: str = None):
     r = requests.delete(url)
 
 
-@st.cache(show_spinner=False)
 def get_data(project_name: str, current_page: int, url: str = None):
     """ Get data of the given project. """
     if url is None:
@@ -82,6 +81,21 @@ def load_projects(url: str = None) -> List[str]:
 
     r = requests.get(url)
     return r.json()['projects']
+
+
+def update_label_data(project_name: str, current_page: int, new_labels: List[str],
+                      url: str = None):
+    """ Update the labels of the labeled data. """
+    headers = {
+        'content-type': 'application/json',
+        'Accept-Charset': 'UTF-8',
+    }
+    if url is None:
+        url = os.environ['API_ADDRESS'] + os.environ['UPDATE_LABEL_DATA']
+
+    url = f'{url}/{project_name}/{current_page}'
+    data = {'new_labels': new_labels}
+    r = requests.put(url, data=json.dumps(data), headers=headers)
 
 
 def update_project_info(project_name: str, project_info: dict, new_label: str,

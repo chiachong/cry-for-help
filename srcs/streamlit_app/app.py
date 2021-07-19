@@ -61,6 +61,13 @@ def main():
                 st.write(templates.page_number_html(session_state.current_page, data['total']),
                          unsafe_allow_html=True)
                 st.write(templates.text_data_html(data['text']), unsafe_allow_html=True)
+                if len(labels) > 0:
+                    new_labels, submit_label = widgets.label_data(labels, data['label'])
+                    if submit_label:
+                        app_utils.update_label_data(current_project, session_state.current_page,
+                                                    new_labels)
+                else:
+                    st.write(templates.no_label_html(labels), unsafe_allow_html=True)
             else:
                 st.write('No data in this project. Please import data to start labeling.')
         else:

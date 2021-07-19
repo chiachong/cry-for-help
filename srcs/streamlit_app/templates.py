@@ -18,6 +18,15 @@ def label_list_html(labels: List[str]) -> str:
     return html
 
 
+def no_label_html(labels: List[str]) -> str:
+    """ HTML scripts to display current label and update label. """
+    return """
+    <div style="color:grey;font-size:90%;margin-top:1em">
+        Please define a label to start labelling.
+    </div>
+    """
+
+
 def create_date_html(date: str) -> str:
     """ HTML scripts to display the create date of a project. """
     return f"""
