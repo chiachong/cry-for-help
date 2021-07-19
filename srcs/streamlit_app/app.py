@@ -3,10 +3,11 @@ import yaml
 import pandas as pd
 import streamlit as st
 
-from srcs.streamlit_app import app_utils, templates, widgets
+from srcs.streamlit_app import app_utils, SessionState, templates, widgets
 
 CONFIG = './config.yaml'
 st.set_page_config(page_title='labelStream', layout='wide')
+session_state = SessionState.get(current_page=0)
 
 
 def main():
@@ -28,7 +29,16 @@ def main():
     _, left_column, right_column, _ = st.beta_columns([1, 50, 20, 1])
     with left_column:
         st.title('Text Classification Data')
-        st.write('No data in this project. Please import data to start labeling.')
+        if current_project is not None:
+            data = app_utils.get_data(current_project, session_state.current_page)
+            if data['total'] > 0:
+                st.write(templates.page_number_html(session_state.current_page, data['total']),
+                         unsafe_allow_html=True)
+                st.write(templates.text_data_html(data['text']), unsafe_allow_html=True)
+            else:
+                st.write('No data in this project. Please import data to start labeling.')
+        else:
+            st.write('No project. No data. No cry.')
 
     if current_project is not None:
         project_info = app_utils.get_project_info(current_project)
@@ -53,6 +63,14 @@ def main():
             # import data
             file, add_data, text_column = widgets.import_data()
             app_utils.add_texts(current_project, file, add_data, text_column)
+
+    para = st.experimental_get_query_params()
+    # clicked next or previous page
+    if 'page' in para.keys():
+        st.experimental_set_query_params()
+        new_page = int(para['page'][0]) - 1
+        session_state.current_page = new_page
+        app_utils.rerun()
 
 
 if __name__ == '__main__':

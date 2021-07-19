@@ -43,6 +43,17 @@ def delete_project(project_name: str, url: str = None):
     r = requests.delete(url)
 
 
+@st.cache(show_spinner=False)
+def get_data(project_name: str, current_page: int, url: str = None):
+    """ Get data of the given project. """
+    if url is None:
+        url = os.environ['API_ADDRESS'] + os.environ['GET_DATA']
+
+    url = f'{url}/{project_name}/{current_page}'
+    r = requests.get(url)
+    return r.json()
+
+
 def get_project_info(project_name: str, url: str = None):
     """ Get information of the given project. """
     if url is None:
