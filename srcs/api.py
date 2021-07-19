@@ -119,6 +119,18 @@ def delete_project(project_name):
     return {'success': True}, 200, {'ContentType': 'application/json'}
 
 
+@app.route(f'{API_ENDPOINTS["UPDATE_LABEL_DATA"]}/<project_name>/<int:current_page>', methods=['PUT'])
+@cross_origin()
+def update_label_data(project_name: str, current_page: int):
+    """ Update the labeled data. """
+    new_labels = request.get_json()['new_labels']
+    df = pd.read_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'))
+    df.verified.iloc[current_page] = str(datetime.now()).split('.')[0] if new_labels else 0
+    df.label.iloc[current_page] = ':sep:'.join(new_labels)
+    df.to_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'), index=False)
+    return {'success': True}, 200, {'ContentType': 'application/json'}
+
+
 @app.route(f'{API_ENDPOINTS["UPDATE_PROJECT_INFO"]}/<project_name>', methods=['POST'])
 @cross_origin()
 def update_project_info(project_name):
