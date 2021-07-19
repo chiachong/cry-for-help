@@ -30,6 +30,30 @@ def add_text_data(project_name: str):
     return {'success': True}, 200, {'ContentType': 'application/json'}
 
 
+@app.route(f'{API_ENDPOINTS["GET_DATA"]}/<project_name>/<int:current_page>', methods=['GET'])
+@cross_origin()
+def get_data(project_name: str, current_page: int):
+    """ Get and return data and label in a dictionary. """
+    try:
+        df = pd.read_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'))
+        total = len(df)
+        text = df.texts.iloc[current_page]
+        verified = str(df.verified.iloc[current_page])
+        label = str(df.label.iloc[current_page])
+        if label == 'nan':
+            label = ''
+    except FileNotFoundError:
+        total = 0
+        text = None
+        verified = None
+        label = None
+    return {
+        'total': total,
+        'text': text,
+        'verified': verified,
+        'label': label,
+    }
+
 @app.route(f'{API_ENDPOINTS["GET_PROJECT_INFO"]}/<project_name>', methods=['GET'])
 @cross_origin()
 def get_project_info(project_name: str):
