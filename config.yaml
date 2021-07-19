@@ -9,4 +9,5 @@ API_ENDPOINTS:
     ADD_DATA: '/api/v1/project/data'
     GET_DATA: '/api/v1/project/data'
     GET_PROJECT_INFO: '/api/v1/project/info'
+    UPDATE_LABEL_DATA: '/api/v1/project/data'
     UPDATE_PROJECT_INFO: '/api/v1/project/info'
