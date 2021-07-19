@@ -27,19 +27,7 @@ def main():
         projects = widgets.delete_project(projects)
 
     _, left_column, right_column, _ = st.beta_columns([1, 50, 20, 1])
-    with left_column:
-        st.title('Text Classification Data')
-        if current_project is not None:
-            data = app_utils.get_data(current_project, session_state.current_page)
-            if data['total'] > 0:
-                st.write(templates.page_number_html(session_state.current_page, data['total']),
-                         unsafe_allow_html=True)
-                st.write(templates.text_data_html(data['text']), unsafe_allow_html=True)
-            else:
-                st.write('No data in this project. Please import data to start labeling.')
-        else:
-            st.write('No project. No data. No cry.')
-
+    # display and update project info at the right column
     if current_project is not None:
         project_info = app_utils.get_project_info(current_project)
         labels = project_info['label']
@@ -63,6 +51,20 @@ def main():
             # import data
             file, add_data, text_column = widgets.import_data()
             app_utils.add_texts(current_project, file, add_data, text_column)
+
+    # display data and labelling at the left column
+    with left_column:
+        st.title('Text Classification Data')
+        if current_project is not None:
+            data = app_utils.get_data(current_project, session_state.current_page)
+            if data['total'] > 0:
+                st.write(templates.page_number_html(session_state.current_page, data['total']),
+                         unsafe_allow_html=True)
+                st.write(templates.text_data_html(data['text']), unsafe_allow_html=True)
+            else:
+                st.write('No data in this project. Please import data to start labeling.')
+        else:
+            st.write('No project. No data. No cry.')
 
     para = st.experimental_get_query_params()
     # clicked next or previous page
