@@ -99,8 +99,8 @@ def update_label_data(project_name: str, current_page: int, new_labels: List[str
 
 
 def update_project_info(project_name: str, project_info: dict, new_label: str,
-                        new_description: str, add_label: bool,
-                        add_description: bool, url: str = None):
+                        new_description: str, add_description: bool,
+                        label_to_delete: str, url: str = None):
     """ Update project description and labels. """
     headers = {
         'content-type': 'application/json',
@@ -111,8 +111,11 @@ def update_project_info(project_name: str, project_info: dict, new_label: str,
 
     url = f'{url}/{project_name}'
     new_project_info = copy.deepcopy(project_info)
-    if add_label and new_label not in project_info['label']:
+    if new_label is not None and new_label not in project_info['label']:
         new_project_info['label'].append(new_label)
+
+    if label_to_delete is not None:
+        new_project_info['label'].remove(label_to_delete)
 
     if add_description and new_description != project_info['description']:
         new_project_info['description'] = new_description

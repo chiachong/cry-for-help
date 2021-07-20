@@ -17,6 +17,16 @@ def add_and_display_label(labels: List[str]):
     return new_label, _add
 
 
+def add_label():
+    """ An expander widget to add label. """
+    with st.beta_expander('Add label'):
+        new_label = st.text_input('Define new label:')
+        _add = st.button('Add', key='button_submit_define_label')
+        if _add:
+            return new_label
+    return None
+
+
 def add_project(projects: List[str]) -> List[str]:
     """ An expander widgets to add new project """
     with st.beta_expander('Add new project'):
@@ -32,6 +42,20 @@ def add_project(projects: List[str]) -> List[str]:
                 app_utils.rerun()
 
         return projects
+
+
+def delete_label(labels: List[str]):
+    """ An expander widget to delete a label. """
+    with st.beta_expander('Delete label'):
+        to_delete = st.selectbox('Delete a label:', ['- Select -'] + labels)
+        if to_delete != '- Select -':
+            _delete = st.button('Delete', key='button_submit_delete_label')
+        else:
+            _delete = None
+
+        if _delete:
+            return to_delete
+    return None
 
 
 def delete_project(projects: List[str]) -> List[str]:

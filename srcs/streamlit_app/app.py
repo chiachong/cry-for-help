@@ -44,10 +44,16 @@ def main():
             if new_description != description:
                 add_description = st.button('Save', key='button_save_description')
 
-            new_label, add_label = widgets.add_and_display_label(labels)
+            # display list of labels
+            st.write(templates.label_list_html(labels), unsafe_allow_html=True)
+            # expander to add label
+            new_label = widgets.add_label()
+            # expander to delete label
+            label_to_delete = widgets.delete_label(labels)
             # update description and labels
             app_utils.update_project_info(current_project, project_info, new_label,
-                                          new_description, add_label, add_description)
+                                          new_description, add_description,
+                                          label_to_delete)
             # import data
             file, add_data, text_column = widgets.import_data()
             app_utils.add_texts(current_project, file, add_data, text_column)
