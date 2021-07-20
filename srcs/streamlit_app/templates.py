@@ -69,3 +69,12 @@ def text_data_html(text: str) -> str:
             {text}
         </div>
     """
+
+
+def verified_datetime_html(date_time: str) -> str:
+    """ HTML scripts to display the verification datetime. """
+    return f"""
+        <div style="color:grey;font-size:90%;">
+            Verified at {date_time}
+        </div>
+    """

@@ -68,6 +68,10 @@ def main():
                                                     new_labels)
                 else:
                     st.write(templates.no_label_html(labels), unsafe_allow_html=True)
+                # display the verification datetime
+                if data['verified'] != '0':
+                    st.write(templates.verified_datetime_html(data['verified']),
+                             unsafe_allow_html=True)
             else:
                 st.write('No data in this project. Please import data to start labeling.')
         else:
