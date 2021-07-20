@@ -3,14 +3,20 @@ from typing import List
 
 def label_list_html(labels: List[str]) -> str:
     """ HTML scripts to display a list of labels. """
+    html = """
+            <div style="font-size:115%;font-weight:450;">
+                Labels
+            </div>
+            <hr style="margin-top:0.5em;margin-bottom:0.5em;">
+    """
     if len(labels) > 0:
-        html = f"""
+        html += f"""
             <ul style="margin-bottom:1.1em;">
                 {' '.join([f'<li> {label} </li>' for label in labels])}
             </ul>
         """
     else:
-        html = """
+        html += """
             <div style="color:grey;font-size:90%;margin-bottom:1.1em;">
                 Label has not been defined yet.
             </div>
