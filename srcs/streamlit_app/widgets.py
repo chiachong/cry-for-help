@@ -97,7 +97,7 @@ def import_data():
         if file is not None:
             df = pd.read_csv(file)
             # select the column containing the texts to be labelled
-            column = st.selectbox('Column containing the texts', list(df.columns))
+            column = st.radio('Column containing the texts', list(df.columns))
             _add = st.button('Import', key='button_submit_add_data')
             file = df
         else:
