@@ -68,8 +68,8 @@ def main():
                          unsafe_allow_html=True)
                 st.write(templates.text_data_html(data['text']), unsafe_allow_html=True)
                 if len(labels) > 0:
-                    new_labels, submit_label = widgets.label_data(labels, data['label'])
-                    if submit_label:
+                    new_labels, verify_label = widgets.label_data(labels, data['label'])
+                    if verify_label:
                         app_utils.update_label_data(current_project, session_state.current_page,
                                                     new_labels)
                 else:

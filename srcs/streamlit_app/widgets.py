@@ -84,10 +84,10 @@ def label_data(labels: List[str], current_label: List[str]):
     new_labels = [labels[i] for i in range(len(labels)) if checkboxes[i]]
     # display a submit button if any label checkboxes is changed
     if set(new_labels) != set(current_label):
-        submit = st.button('Submit', key='button_submit_label_data')
+        verify = st.button('Verify', key='button_submit_label_data')
     else:
-        submit = None
-    return new_labels, submit
+        verify = None
+    return new_labels, verify
 
 
 def import_data():
