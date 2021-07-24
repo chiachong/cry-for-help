@@ -44,6 +44,11 @@ def main():
             if new_description != description:
                 add_description = st.button('Save', key='button_save_description')
 
+            # labelling progress
+            if project_info['progress'] is not None:
+                st.write(templates.progress_bar_html(project_info['progress']),
+                         unsafe_allow_html=True)
+
             # display list of labels
             st.write(templates.label_list_html(labels), unsafe_allow_html=True)
             # expander to add label

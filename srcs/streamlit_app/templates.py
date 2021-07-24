@@ -60,6 +60,45 @@ def page_number_html(current_page: int, total_page_number: int) -> str:
     return html
 
 
+def progress_bar_html(labeled_proportion: float) -> str:
+    """ HTML scripts to display progress of labelling in percentage. """
+    sub_header_style = """
+        font-size: 115%;
+        font-weight: 450;
+        margin-top: 0.3em;
+        margin-bottom: 0.3em;
+    """
+    container_style = """
+        background-color: rgb(240, 240, 240);
+        border-radius: 5px;
+        width: 100%;
+    """
+    progress_bar_style = f"""
+        background-color: rgb(246, 51, 102);
+        height: 10px;
+        border-radius: 5px;
+        width: {labeled_proportion}%;
+    """
+    percent_style = f"""
+        text-align: right;
+        margin-bottom: 0.8em;
+        font-size: 90%;
+        width:{labeled_proportion}%;
+    """
+    return f"""
+        <div style="{sub_header_style}">
+            Verified
+        </div>
+        <div style="{container_style}">
+            <div style="{progress_bar_style}">
+            </div>
+        </div>
+        <div style="{percent_style}">
+            {labeled_proportion}%
+        </div>
+    """
+
+
 def text_data_html(text: str) -> str:
     """ HTML scripts to display text to be labelled. """
     style = """
