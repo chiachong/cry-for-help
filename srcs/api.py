@@ -23,7 +23,7 @@ api = Api(app)
 def add_text_data(project_name: str):
     """ Add texts to be labelled. """
     new_data = request.get_json()
-    new_data['verified'] = [0] * len(new_data['texts'])
+    new_data['verified'] = ['0'] * len(new_data['texts'])
     new_data['label'] = None
     df = pd.DataFrame(new_data)
     df.to_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'), index=False)
@@ -61,11 +61,21 @@ def get_project_info(project_name: str):
     selected_df = df.loc[df.project == project_name].reset_index()
     label = selected_df.label[0]
     label = [] if str(label) == 'nan' else label.split(':sep:')
+    # get proportion of labeled data
+    try:
+        df = pd.read_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'))
+        progress = df['verified'].value_counts()['0'] / len(df)
+        progress = f'{(1 - progress) * 100:.2f}'
+    except FileNotFoundError:  # if no data been added
+        progress = None
+    except KeyError:  # if no labeled data
+        progress = '0'
     return {
         'project': project_name,
         'createDate': selected_df.createDate[0],
         'description': selected_df.description[0],
         'label': label,
+        'progress': progress,
     }
 
 
