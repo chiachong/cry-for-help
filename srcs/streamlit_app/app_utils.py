@@ -99,8 +99,8 @@ def update_label_data(project_name: str, current_page: int, new_labels: List[str
 
 
 def update_project_info(project_name: str, project_info: dict, new_label: str,
-                        new_description: str, add_description: bool,
-                        label_to_delete: str, url: str = None):
+                        new_description: str, label_to_delete: str,
+                        url: str = None):
     """ Update project description and labels. """
     headers = {
         'content-type': 'application/json',
@@ -117,7 +117,7 @@ def update_project_info(project_name: str, project_info: dict, new_label: str,
     if label_to_delete is not None:
         new_project_info['label'].remove(label_to_delete)
 
-    if add_description and new_description != project_info['description']:
+    if new_description is not None:
         new_project_info['description'] = new_description
 
     if new_project_info['label'] != project_info['label'] or \

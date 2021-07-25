@@ -36,14 +36,8 @@ def main():
         with right_column:
             st.header(current_project)
             st.write(templates.create_date_html(create_date), unsafe_allow_html=True)
-            # project description text box height if the description is changed
-            text_area_height = (len(description) + 42 - 1) // 42 * 30
-            new_description = st.text_area('', value=description, height=text_area_height)
-            add_description = False
-            # display a button to save new project description
-            if new_description != description:
-                add_description = st.button('Save', key='button_save_description')
-
+            # project description text area
+            new_description = widgets.project_description(description)
             # labelling progress
             if project_info['progress'] is not None:
                 st.write(templates.progress_bar_html(project_info['progress']),
@@ -57,8 +51,7 @@ def main():
             label_to_delete = widgets.delete_label(labels)
             # update description and labels
             app_utils.update_project_info(current_project, project_info, new_label,
-                                          new_description, add_description,
-                                          label_to_delete)
+                                          new_description, label_to_delete)
             # import data
             file, add_data, text_column = widgets.import_data()
             app_utils.add_texts(current_project, file, add_data, text_column)

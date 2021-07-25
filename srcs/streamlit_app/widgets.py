@@ -104,3 +104,16 @@ def import_data():
             _add, column = None, None
 
     return file, _add, column
+
+
+def project_description(description: str) -> str:
+    """ Text area for displaying and changing the project description. """
+    # project description text area height
+    text_area_height = (len(description) + 42 - 1) // 42 * 30
+    new_description = st.text_area('', value=description, height=text_area_height)
+    add_description = False
+    # display a button to save new description if the description is changed
+    if new_description != description:
+        add_description = st.button('Save', key='button_save_description')
+
+    return new_description if add_description else None
