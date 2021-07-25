@@ -1,7 +1,6 @@
 import os
 import copy
 import json
-import yaml
 import requests
 import pandas as pd
 import streamlit as st

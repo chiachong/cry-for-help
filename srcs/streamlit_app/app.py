@@ -1,6 +1,3 @@
-import os
-import yaml
-import pandas as pd
 import streamlit as st
 
 from srcs.streamlit_app import app_utils, SessionState, templates, widgets
@@ -60,15 +57,16 @@ def main():
     with left_column:
         st.title('Text Classification Data')
         if current_project is not None:
-            data = app_utils.get_data(current_project, session_state.current_page)
+            current_page = session_state.current_page
+            data = app_utils.get_data(current_project, current_page)
             if data['total'] > 0:
-                st.write(templates.page_number_html(session_state.current_page, data['total']),
+                st.write(templates.page_number_html(current_page, data['total']),
                          unsafe_allow_html=True)
                 st.write(templates.text_data_html(data['text']), unsafe_allow_html=True)
                 if len(labels) > 0:
                     new_labels, verify_label = widgets.label_data(labels, data['label'])
                     if verify_label:
-                        app_utils.update_label_data(current_project, session_state.current_page,
+                        app_utils.update_label_data(current_project, current_page,
                                                     new_labels)
                 else:
                     st.write(templates.no_label_html(labels), unsafe_allow_html=True)
