@@ -1,6 +1,7 @@
 import os
 import copy
 import json
+import base64
 import requests
 import pandas as pd
 import streamlit as st
@@ -40,6 +41,19 @@ def delete_project(project_name: str, url: str = None):
 
     url = f'{url}/{project_name}'
     r = requests.delete(url)
+
+
+def download_csv(project_name: str, all_or_labeled: str, url: str = None):
+    """ Download csv of all data or just labeled data. """
+    if url is None:
+        url = os.environ['API_ADDRESS'] + os.environ['DOWNLOAD_DATA']
+
+    url = f'{url}/{project_name}/{all_or_labeled}'
+    r = requests.get(url)
+    df = pd.DataFrame(r.json())
+    csv = df.to_csv(index=False)  # if no filename is given, a string is returned
+    csv = base64.b64encode(csv.encode()).decode()  # convert the csv into base64
+    return csv
 
 
 def get_data(project_name: str, current_page: int, url: str = None):

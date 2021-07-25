@@ -70,6 +70,24 @@ def delete_project(projects: List[str]) -> List[str]:
             return projects
 
 
+def export_data(project_name: str):
+    """ Download csv of all data or just labeled data. """
+    format_dict = {
+        'labeled': 'Labeled data',
+        'all': 'All data',
+    }
+    with st.beta_expander('Export data'):
+        all_or_labeled = st.radio('Export all data or just labeled data',
+                                  list(format_dict.keys()),
+                                  format_func=lambda x: format_dict[x],
+                                  key='button_all_or_labeled')
+        export = st.button('Export', key='button_submit_export_data')
+        if export:
+            filename = f'{project_name}_{all_or_labeled}.csv'
+            csv = app_utils.download_csv(project_name, all_or_labeled)
+            st.write(templates.save_csv_html(filename, csv), unsafe_allow_html=True)
+
+
 def label_data(labels: List[str], current_label: List[str]):
     """ Checkboxes to label data. """
     st.write('')  # an empty line to make spacing

@@ -52,6 +52,8 @@ def main():
             # import data
             file, add_data, text_column = widgets.import_data()
             app_utils.add_texts(current_project, file, add_data, text_column)
+            # export data
+            widgets.export_data(current_project)
 
     # display data and labelling at the left column
     with left_column:

@@ -100,6 +100,42 @@ def progress_bar_html(labeled_proportion: float) -> str:
     """
 
 
+def save_csv_html(filename: str, csv: str) -> str:
+    """ HTML scripts to display button to save exported data in csv file. """
+    return f"""
+        <style>
+            #save_csv {{
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background-color: rgb(255, 255, 255);
+                color: rgb(38, 39, 48);
+                padding: .25rem .75rem;
+                position: relative;
+                text-decoration: none;
+                border-radius: 4px;
+                border-width: 1px;
+                border-style: solid;
+                border-color: rgb(230, 234, 241);
+                border-image: initial;
+                margin-bottom: 1em;
+            }}
+            #save_csv:hover {{
+                border-color: rgb(246, 51, 102);
+                color: rgb(246, 51, 102);
+            }}
+            #save_csv:active {{
+                box-shadow: none;
+                background-color: rgb(246, 51, 102);
+                color: white;
+                }}
+        </style>
+        <a download="{filename}" id="save_csv" href="data:file/csv;base64,{csv}">
+            Save to folder
+        </a>
+    """
+
+
 def text_data_html(text: str) -> str:
     """ HTML scripts to display text to be labelled. """
     style = """
