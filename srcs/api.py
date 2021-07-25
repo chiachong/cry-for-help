@@ -37,6 +37,7 @@ def get_data(project_name: str, current_page: int):
     try:
         df = pd.read_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'))
         total = len(df)
+        current_page = min(total - 1, current_page)
         text = df.texts.iloc[current_page]
         verified = str(df.verified.iloc[current_page])
         label = str(df.label.iloc[current_page])

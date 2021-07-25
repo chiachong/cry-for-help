@@ -85,7 +85,7 @@ def main():
     # clicked next or previous page
     if 'page' in para.keys():
         st.experimental_set_query_params()
-        new_page = int(para['page'][0]) - 1
+        new_page = max(1, int(para['page'][0])) - 1  # make sure the min is 0
         session_state.current_page = new_page
         app_utils.rerun()
 
