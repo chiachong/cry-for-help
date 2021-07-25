@@ -6,6 +6,7 @@ API_ENDPOINTS:
     LOAD_PROJECTS: '/api/v1/projects'
     CREATE_PROJECT: '/api/v1/project'
     DELETE_PROJECT: '/api/v1/project/delete'
+    DOWNLOAD_DATA: '/api/v1/project/data/download'
     ADD_DATA: '/api/v1/project/data'
     GET_DATA: '/api/v1/project/data'
     GET_PROJECT_INFO: '/api/v1/project/info'

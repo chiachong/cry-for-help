@@ -30,6 +30,25 @@ def add_text_data(project_name: str):
     return {'success': True}, 200, {'ContentType': 'application/json'}
 
 
+@app.route(f'{API_ENDPOINTS["DOWNLOAD_DATA"]}/<project_name>/<all_or_labeled>', methods=['GET'])
+@cross_origin()
+def download_data(project_name: str, all_or_labeled: str):
+    """ Download csv of all data or just labeled data. """
+    df = pd.read_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'))
+    if all_or_labeled == 'labeled':
+        df = df[df['verified'] != '0']
+    # process the labels
+    df['label'] = df['label'].apply(lambda x: x.replace(':sep:', ', '))
+    text = df.texts.to_list()
+    verified = df.verified.to_list()
+    label = df.label.to_list()
+    return {
+        'text': text,
+        'verified': verified,
+        'label': label,
+    }
+
+
 @app.route(f'{API_ENDPOINTS["GET_DATA"]}/<project_name>/<int:current_page>', methods=['GET'])
 @cross_origin()
 def get_data(project_name: str, current_page: int):
