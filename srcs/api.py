@@ -38,7 +38,7 @@ def download_data(project_name: str, all_or_labeled: str):
     if all_or_labeled == 'labeled':
         df = df[df['verified'] != '0']
     # process the labels
-    df['label'] = df['label'].apply(lambda x: x.replace(':sep:', ', '))
+    df['label'] = df['label'].apply(lambda x: str(x).replace(':sep:', ', '))
     text = df.texts.to_list()
     verified = df.verified.to_list()
     label = df.label.to_list()
