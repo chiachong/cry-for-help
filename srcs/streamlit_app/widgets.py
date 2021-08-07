@@ -70,8 +70,12 @@ def delete_project(projects: List[str]) -> List[str]:
             return projects
 
 
-def export_data(project_name: str):
-    """ Download csv of all data or just labeled data. """
+def export_data(project_name: str, session_state):
+    """
+    An expander widget to export all data or just labeled data. This will return
+    a streamlit placeholder to display download button after clicking the export
+    button.
+    """
     format_dict = {
         'labeled': 'Labeled data',
         'all': 'All data',
@@ -85,7 +89,8 @@ def export_data(project_name: str):
         if export:
             filename = f'{project_name}_{all_or_labeled}.csv'
             csv = app_utils.download_csv(project_name, all_or_labeled)
-            st.write(templates.save_csv_html(filename, csv), unsafe_allow_html=True)
+            session_state.download = (filename, csv)
+        return st.empty()
 
 
 def label_data(labels: List[str], current_label: List[str]):

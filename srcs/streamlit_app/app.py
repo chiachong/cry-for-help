@@ -4,7 +4,7 @@ from srcs.streamlit_app import app_utils, SessionState, templates, widgets
 
 CONFIG = './config.yaml'
 st.set_page_config(page_title='labelStream', layout='wide')
-session_state = SessionState.get(current_page=0)
+session_state = SessionState.get(current_page=0, download=None)
 
 
 def main():
@@ -53,7 +53,7 @@ def main():
             file, add_data, text_column = widgets.import_data()
             app_utils.add_texts(current_project, file, add_data, text_column)
             # export data
-            widgets.export_data(current_project)
+            download_placeholder = widgets.export_data(current_project, session_state)
 
     # display data and labelling at the left column
     with left_column:
@@ -80,6 +80,11 @@ def main():
                 st.write('No data in this project. Please import data to start labeling.')
         else:
             st.write('No project. No data. No cry.')
+
+    if session_state.download is not None:
+        # display a download button after clicking the export button
+        download_placeholder.write(templates.save_csv_html(*session_state.download),
+                                   unsafe_allow_html=True)
 
     para = st.experimental_get_query_params()
     # clicked next or previous page
