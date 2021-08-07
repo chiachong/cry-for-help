@@ -4,7 +4,7 @@ from srcs.streamlit_app import app_utils, SessionState, templates, widgets
 
 CONFIG = './config.yaml'
 st.set_page_config(page_title='labelStream', layout='wide')
-session_state = SessionState.get(current_page=0, download=None)
+session_state = SessionState.get(project_info=None, current_page=0, download=None)
 
 
 def main():
@@ -26,7 +26,11 @@ def main():
     _, left_column, right_column, _ = st.beta_columns([1, 50, 20, 1])
     # display and update project info at the right column
     if current_project is not None:
-        project_info = app_utils.get_project_info(current_project)
+        if session_state.project_info is None or \
+                session_state.project_info['project'] != current_project:
+            app_utils.get_project_info(current_project, session_state)
+
+        project_info = session_state.project_info
         labels = project_info['label']
         description = project_info['description']
         create_date = project_info['createDate']
@@ -47,8 +51,9 @@ def main():
             # expander to delete label
             label_to_delete = widgets.delete_label(labels)
             # update description and labels
-            app_utils.update_project_info(current_project, project_info, new_label,
-                                          new_description, label_to_delete)
+            app_utils.update_project_info(current_project, project_info,
+                                          new_label, new_description,
+                                          label_to_delete, session_state)
             # import data
             file, add_data, text_column = widgets.import_data()
             app_utils.add_texts(current_project, file, add_data, text_column)

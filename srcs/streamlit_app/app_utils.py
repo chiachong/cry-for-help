@@ -66,14 +66,14 @@ def get_data(project_name: str, current_page: int, url: str = None):
     return r.json()
 
 
-def get_project_info(project_name: str, url: str = None):
+def get_project_info(project_name: str, session_state, url: str = None):
     """ Get information of the given project. """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['GET_PROJECT_INFO']
 
     url = f'{url}/{project_name}'
     r = requests.get(url)
-    return r.json()
+    session_state.project_info = r.json()
 
 
 @st.cache(show_spinner=False)
@@ -113,7 +113,7 @@ def update_label_data(project_name: str, current_page: int, new_labels: List[str
 
 def update_project_info(project_name: str, project_info: dict, new_label: str,
                         new_description: str, label_to_delete: str,
-                        url: str = None):
+                        session_state, url: str = None):
     """ Update project description and labels. """
     headers = {
         'content-type': 'application/json',
@@ -125,18 +125,20 @@ def update_project_info(project_name: str, project_info: dict, new_label: str,
     url = f'{url}/{project_name}'
     new_project_info = copy.deepcopy(project_info)
     if new_label is not None and new_label not in project_info['label']:
+        session_state.project_info['label'].append(new_label)
         new_project_info['label'].append(new_label)
 
     if label_to_delete is not None:
+        session_state.project_info['label'].remove(label_to_delete)
         new_project_info['label'].remove(label_to_delete)
 
     if new_description is not None:
+        session_state.project_info['description'] = new_description
         new_project_info['description'] = new_description
 
     if new_project_info['label'] != project_info['label'] or \
         new_project_info['description'] != project_info['description']:
         r = requests.post(url, data=json.dumps(new_project_info), headers=headers)
-        rerun()
 
 
 def rerun():
