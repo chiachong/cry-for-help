@@ -140,6 +140,7 @@ def text_data_html(text: str) -> str:
     """ HTML scripts to display text to be labelled. """
     style = """
         border: none;
+        border-radius: 5px;
         margin-bottom: 1em;
         padding: 20px;
         height: auto;
