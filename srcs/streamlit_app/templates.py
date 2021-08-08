@@ -45,7 +45,7 @@ def create_date_html(date: str) -> str:
 def page_number_html(current_page: int, total_page_number: int) -> str:
     """ HTML scripts to display the page number. """
     current_page = min(total_page_number - 1, current_page)
-    html = '<div style="text-align:center;width:90%;margin-top:0.3em;margin-bottom:0.5em;">'
+    html = '<div style="text-align:center;margin-top:0.3em;margin-bottom:0.5em;">'
     if current_page > 0:
         html += f'<a href="?page={current_page}" style="display:inline;">&lt</a>'
 
@@ -144,7 +144,6 @@ def text_data_html(text: str) -> str:
         margin-bottom: 1em;
         padding: 20px;
         height: auto;
-        width: 90%;
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     """
     return f"""

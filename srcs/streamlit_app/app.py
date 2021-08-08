@@ -27,7 +27,7 @@ def main():
                 'Select a project to work with:', session_state.projects,
             )
 
-    _, left_column, right_column, _ = st.beta_columns([1, 50, 20, 1])
+    left_column, _, right_column = st.beta_columns([50, 2, 20])
     # display and update project info at the right column
     if session_state.current_project is not None:
         # get project info for the first time or when switching projects
