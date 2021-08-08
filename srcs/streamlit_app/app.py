@@ -4,100 +4,120 @@ from srcs.streamlit_app import app_utils, SessionState, templates, widgets
 
 CONFIG = './config.yaml'
 st.set_page_config(page_title='labelStream', layout='wide')
-session_state = SessionState.get(project_info=None, current_page=0, download=None)
+session_state = SessionState.get(projects=[], current_page=0, current_project=None,
+                                 project_info=None, data=None, download=None)
 
 
 def main():
+    update_session_state(session_state)
     # load project config
     app_utils.load_config(CONFIG)
     # load list of available projects
-    projects = app_utils.load_projects()
+    session_state.projects = app_utils.load_projects()
     with st.sidebar:
         st.sidebar.title('Projects')
-        if len(projects) == 0:
-            st.write('No available project. Please add a new project.')
-            current_project = None
+        project_holder = st.empty()  # placeholder to show available projects
+        widgets.add_project(session_state)
+        widgets.delete_project(session_state)
+        # display list of available projects
+        if len(session_state.projects) == 0:
+            project_holder.write('No available project. Please add a new project.')
         else:
-            current_project = st.radio('Select a project to work with:', projects)
-
-        projects = widgets.add_project(projects)
-        projects = widgets.delete_project(projects)
+            session_state.current_project = project_holder.radio(
+                'Select a project to work with:', session_state.projects,
+            )
 
     _, left_column, right_column, _ = st.beta_columns([1, 50, 20, 1])
     # display and update project info at the right column
-    if current_project is not None:
+    if session_state.current_project is not None:
+        # get project info for the first time or when switching projects
         if session_state.project_info is None or \
-                session_state.project_info['project'] != current_project:
-            app_utils.get_project_info(current_project, session_state)
+                session_state.project_info['project'] != session_state.current_project:
+            app_utils.get_project_info(session_state)
 
-        project_info = session_state.project_info
-        labels = project_info['label']
-        description = project_info['description']
-        create_date = project_info['createDate']
         with right_column:
-            st.header(current_project)
-            st.write(templates.create_date_html(create_date), unsafe_allow_html=True)
+            # display project name
+            st.header(session_state.current_project)
+            # display project creation datetime
+            st.write(templates.create_date_html(session_state.project_info['createDate']),
+                     unsafe_allow_html=True)
+            updates = []
             # project description text area
-            new_description = widgets.project_description(description)
-            # labelling progress
-            if project_info['progress'] is not None:
-                st.write(templates.progress_bar_html(project_info['progress']),
-                         unsafe_allow_html=True)
-
-            # display list of labels
-            st.write(templates.label_list_html(labels), unsafe_allow_html=True)
+            updates.append(widgets.project_description(session_state))
+            # placeholder to display the labelling progress
+            progress_holder = st.empty()
+            # placeholder to display list of labels
+            label_list_holder = st.empty()
             # expander to add label
-            new_label = widgets.add_label()
+            updates.append(widgets.add_label(session_state))
             # expander to delete label
-            label_to_delete = widgets.delete_label(labels)
+            updates.append(widgets.delete_label(session_state))
             # update description and labels
-            app_utils.update_project_info(current_project, project_info,
-                                          new_label, new_description,
-                                          label_to_delete, session_state)
+            if any(updates):
+                app_utils.update_project_info(session_state)
+
             # import data
             file, add_data, text_column = widgets.import_data()
-            app_utils.add_texts(current_project, file, add_data, text_column)
+            app_utils.add_texts(session_state, file, add_data, text_column)
             # export data
-            download_placeholder = widgets.export_data(current_project, session_state)
+            download_placeholder = widgets.export_data(session_state)
 
     # display data and labelling at the left column
     with left_column:
         st.title('Text Classification Data')
-        if current_project is not None:
+        if session_state.current_project is not None:
             current_page = session_state.current_page
-            data = app_utils.get_data(current_project, current_page)
+            data = app_utils.get_data(session_state)
+            session_state.data = data
             if data['total'] > 0:
                 st.write(templates.page_number_html(current_page, data['total']),
                          unsafe_allow_html=True)
                 st.write(templates.text_data_html(data['text']), unsafe_allow_html=True)
-                if len(labels) > 0:
-                    new_labels, verify_label = widgets.label_data(labels, data['label'])
+                # display checkboxes for labeling
+                if len(session_state.project_info['label']) > 0:
+                    new_labels, verify_label = widgets.label_data(session_state)
                     if verify_label:
-                        app_utils.update_label_data(current_project, current_page,
-                                                    new_labels)
+                        app_utils.update_label_data(session_state, new_labels)
                 else:
-                    st.write(templates.no_label_html(labels), unsafe_allow_html=True)
+                    st.write(templates.no_label_html(), unsafe_allow_html=True)
                 # display the verification datetime
-                if data['verified'] != '0':
-                    st.write(templates.verified_datetime_html(data['verified']),
+                if session_state.data['verified'] != '0':
+                    st.write(templates.verified_datetime_html(session_state.data['verified']),
                              unsafe_allow_html=True)
             else:
                 st.write('No data in this project. Please import data to start labeling.')
         else:
             st.write('No project. No data. No cry.')
 
-    if session_state.download is not None:
-        # display a download button after clicking the export button
-        download_placeholder.write(templates.save_csv_html(*session_state.download),
-                                   unsafe_allow_html=True)
+    # update placeholders
+    if session_state.current_project is not None:
+        # display list of defined labels
+        label_list_holder.write(
+            templates.label_list_html(session_state.project_info['label']),
+            unsafe_allow_html=True,
+        )
+        # display progress bar if there is data (not None)
+        if session_state.project_info['progress'] is not None:
+            progress = int(session_state.project_info["progress"])
+            progress = f'{progress / session_state.data["total"] * 100:.2f}'
+            progress_holder.write(
+                templates.progress_bar_html(progress), unsafe_allow_html=True,
+            )
+        # display a download button upon clicking the export button
+        if session_state.download is not None:
+            download_placeholder.write(
+                templates.save_csv_html(*session_state.download),
+                unsafe_allow_html=True,
+            )
 
+
+def update_session_state(session_state):
     para = st.experimental_get_query_params()
     # clicked next or previous page
     if 'page' in para.keys():
         st.experimental_set_query_params()
         new_page = max(1, int(para['page'][0])) - 1  # make sure the min is 0
         session_state.current_page = new_page
-        app_utils.rerun()
 
 
 if __name__ == '__main__':

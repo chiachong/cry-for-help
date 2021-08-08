@@ -1,17 +1,17 @@
 import os
-import copy
 import json
 import base64
 import requests
 import pandas as pd
 import streamlit as st
 from typing import List
+from datetime import datetime
 
 from srcs import utils
 
 
-def add_texts(project_name: str, df: pd.DataFrame, add_data: bool,
-              text_column: str, url: str = None):
+def add_texts(session_state, df: pd.DataFrame, add_data: bool, text_column: str,
+              url: str = None):
     """ Add text data. """
     headers = {
         'content-type': 'application/json',
@@ -20,10 +20,13 @@ def add_texts(project_name: str, df: pd.DataFrame, add_data: bool,
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['ADD_DATA']
 
-    url = f'{url}/{project_name}'
+    url = f'{url}/{session_state.current_project}'
     if add_data and df is not None and text_column is not None:
         new_data = {'texts': df[text_column].to_list()}
         r = requests.put(url, data=json.dumps(new_data), headers=headers)
+        # update progress in session state if it is None
+        if session_state.project_info['progress'] is None:
+            session_state.project_info['progress'] = '0'
 
 
 def create_project(project_name: str, url: str = None):
@@ -56,28 +59,28 @@ def download_csv(project_name: str, all_or_labeled: str, url: str = None):
     return csv
 
 
-def get_data(project_name: str, current_page: int, url: str = None):
+def get_data(session_state, url: str = None):
     """ Get data of the given project. """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['GET_DATA']
 
-    url = f'{url}/{project_name}/{current_page}'
+    url = f'{url}/{session_state.current_project}/{session_state.current_page}'
     r = requests.get(url)
     return r.json()
 
 
-def get_project_info(project_name: str, session_state, url: str = None):
+def get_project_info(session_state, url: str = None):
     """ Get information of the given project. """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['GET_PROJECT_INFO']
 
-    url = f'{url}/{project_name}'
+    url = f'{url}/{session_state.current_project}'
     r = requests.get(url)
     session_state.project_info = r.json()
 
 
 @st.cache(show_spinner=False)
-def load_config(config: str) -> dict:
+def load_config(config: str):
     """ Load project configurations from a .yaml file. """
     config = utils.load_yaml(config)
     os.environ['PROJECT_DIR'] = config['PROJECT_DIR']
@@ -96,8 +99,7 @@ def load_projects(url: str = None) -> List[str]:
     return r.json()['projects']
 
 
-def update_label_data(project_name: str, current_page: int, new_labels: List[str],
-                      url: str = None):
+def update_label_data(session_state, new_labels: List[str], url: str = None):
     """ Update the labels of the labeled data. """
     headers = {
         'content-type': 'application/json',
@@ -106,14 +108,20 @@ def update_label_data(project_name: str, current_page: int, new_labels: List[str
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['UPDATE_LABEL_DATA']
 
-    url = f'{url}/{project_name}/{current_page}'
-    data = {'new_labels': new_labels}
+    url = f'{url}/{session_state.current_project}/{session_state.current_page}'
+    verified = str(datetime.now()).split('.')[0] if len(new_labels) > 0 else '0'
+    progress_changes = 1 if len(new_labels) > 0 else -1
+    new_progress = f'{int(session_state.project_info["progress"]) + progress_changes}'
+    data = {'new_labels': new_labels, 'verified': verified}
+
     r = requests.put(url, data=json.dumps(data), headers=headers)
+    # update label and progress status into session state
+    session_state.data['label'] = new_labels
+    session_state.data['verified'] = verified
+    session_state.project_info['progress'] = new_progress
 
 
-def update_project_info(project_name: str, project_info: dict, new_label: str,
-                        new_description: str, label_to_delete: str,
-                        session_state, url: str = None):
+def update_project_info(session_state, url: str = None):
     """ Update project description and labels. """
     headers = {
         'content-type': 'application/json',
@@ -122,23 +130,9 @@ def update_project_info(project_name: str, project_info: dict, new_label: str,
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['UPDATE_PROJECT_INFO']
 
-    url = f'{url}/{project_name}'
-    new_project_info = copy.deepcopy(project_info)
-    if new_label is not None and new_label not in project_info['label']:
-        session_state.project_info['label'].append(new_label)
-        new_project_info['label'].append(new_label)
-
-    if label_to_delete is not None:
-        session_state.project_info['label'].remove(label_to_delete)
-        new_project_info['label'].remove(label_to_delete)
-
-    if new_description is not None:
-        session_state.project_info['description'] = new_description
-        new_project_info['description'] = new_description
-
-    if new_project_info['label'] != project_info['label'] or \
-        new_project_info['description'] != project_info['description']:
-        r = requests.post(url, data=json.dumps(new_project_info), headers=headers)
+    url = f'{url}/{session_state.current_project}'
+    r = requests.post(url, data=json.dumps(session_state.project_info),
+                      headers=headers)
 
 
 def rerun():

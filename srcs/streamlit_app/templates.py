@@ -24,7 +24,7 @@ def label_list_html(labels: List[str]) -> str:
     return html
 
 
-def no_label_html(labels: List[str]) -> str:
+def no_label_html() -> str:
     """ HTML scripts to display current label and update label. """
     return """
     <div style="color:grey;font-size:90%;margin-top:1em">
@@ -61,7 +61,7 @@ def page_number_html(current_page: int, total_page_number: int) -> str:
     return html
 
 
-def progress_bar_html(labeled_proportion: float) -> str:
+def progress_bar_html(labeled_proportion: str) -> str:
     """ HTML scripts to display progress of labelling in percentage. """
     sub_header_style = """
         font-size: 115%;

@@ -84,8 +84,7 @@ def get_project_info(project_name: str):
     # get proportion of labeled data
     try:
         df = pd.read_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'))
-        progress = df['verified'].value_counts()['0'] / len(df)
-        progress = f'{(1 - progress) * 100:.2f}'
+        progress = str(len(df) - df['verified'].value_counts()['0'])
     except FileNotFoundError:  # if no data been added
         progress = None
     except KeyError:  # if no labeled data
@@ -154,8 +153,9 @@ def delete_project(project_name):
 def update_label_data(project_name: str, current_page: int):
     """ Update the labeled data. """
     new_labels = request.get_json()['new_labels']
+    verified = request.get_json()['verified']
     df = pd.read_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'))
-    df.verified.iloc[current_page] = str(datetime.now()).split('.')[0] if new_labels else 0
+    df.verified.iloc[current_page] = verified
     df.label.iloc[current_page] = ':sep:'.join(new_labels)
     df.to_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'), index=False)
     return {'success': True}, 200, {'ContentType': 'application/json'}
