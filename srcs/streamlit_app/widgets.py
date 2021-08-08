@@ -21,8 +21,11 @@ def add_label(session_state) -> bool:
         new_label = st.text_input('Define new label:')
         _add = st.button('Add', key='button_submit_define_label')
         if _add:
-            session_state.project_info['label'].append(new_label)
-            return True
+            if new_label in session_state.project_info['label']:
+                st.warning(f'The label "{new_label}" is already exist.')
+            else:
+                session_state.project_info['label'].append(new_label)
+                return True
 
     return False
 
