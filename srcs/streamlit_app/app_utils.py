@@ -10,7 +10,7 @@ from datetime import datetime
 from srcs import utils
 
 
-def add_texts(session_state, df: pd.DataFrame, add_data: bool, text_column: str,
+def add_texts(df: pd.DataFrame, add_data: bool, text_column: str,
               url: str = None):
     """ Add text data. """
     headers = {
@@ -20,13 +20,13 @@ def add_texts(session_state, df: pd.DataFrame, add_data: bool, text_column: str,
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['ADD_DATA']
 
-    url = f'{url}/{session_state.current_project}'
+    url = f'{url}/{st.session_state.current_project}'
     if add_data and df is not None and text_column is not None:
         new_data = {'texts': df[text_column].to_list()}
         r = requests.put(url, data=json.dumps(new_data), headers=headers)
         # update progress in session state if it is None
-        if session_state.project_info['progress'] is None:
-            session_state.project_info['progress'] = '0'
+        if st.session_state.project_info['progress'] is None:
+            st.session_state.project_info['progress'] = '0'
 
 
 def create_project(project_name: str, url: str = None):
@@ -59,24 +59,24 @@ def download_csv(project_name: str, all_or_labeled: str, url: str = None):
     return csv
 
 
-def get_data(session_state, url: str = None):
+def get_data(url: str = None):
     """ Get data of the given project. """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['GET_DATA']
 
-    url = f'{url}/{session_state.current_project}/{session_state.current_page}'
+    url = f'{url}/{st.session_state.current_project}/{st.session_state.current_page}'
     r = requests.get(url)
     return r.json()
 
 
-def get_project_info(session_state, url: str = None):
+def get_project_info(url: str = None):
     """ Get information of the given project. """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['GET_PROJECT_INFO']
 
-    url = f'{url}/{session_state.current_project}'
+    url = f'{url}/{st.session_state.current_project}'
     r = requests.get(url)
-    session_state.project_info = r.json()
+    st.session_state.project_info = r.json()
 
 
 @st.cache(show_spinner=False)
@@ -99,7 +99,7 @@ def load_projects(url: str = None) -> List[str]:
     return r.json()['projects']
 
 
-def update_label_data(session_state, new_labels: List[str], url: str = None):
+def update_label_data(new_labels: List[str], url: str = None):
     """ Update the labels of the labeled data. """
     headers = {
         'content-type': 'application/json',
@@ -108,20 +108,20 @@ def update_label_data(session_state, new_labels: List[str], url: str = None):
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['UPDATE_LABEL_DATA']
 
-    url = f'{url}/{session_state.current_project}/{session_state.current_page}'
+    url = f'{url}/{st.session_state.current_project}/{st.session_state.current_page}'
     verified = str(datetime.now()).split('.')[0] if len(new_labels) > 0 else '0'
     progress_changes = 1 if len(new_labels) > 0 else -1
-    new_progress = f'{int(session_state.project_info["progress"]) + progress_changes}'
+    new_progress = f'{int(st.session_state.project_info["progress"]) + progress_changes}'
     data = {'new_labels': new_labels, 'verified': verified}
 
     r = requests.put(url, data=json.dumps(data), headers=headers)
     # update label and progress status into session state
-    session_state.data['label'] = new_labels
-    session_state.data['verified'] = verified
-    session_state.project_info['progress'] = new_progress
+    st.session_state.data['label'] = new_labels
+    st.session_state.data['verified'] = verified
+    st.session_state.project_info['progress'] = new_progress
 
 
-def update_project_info(session_state, url: str = None):
+def update_project_info(url: str = None):
     """ Update project description and labels. """
     headers = {
         'content-type': 'application/json',
@@ -130,8 +130,8 @@ def update_project_info(session_state, url: str = None):
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['UPDATE_PROJECT_INFO']
 
-    url = f'{url}/{session_state.current_project}'
-    r = requests.post(url, data=json.dumps(session_state.project_info),
+    url = f'{url}/{st.session_state.current_project}'
+    r = requests.post(url, data=json.dumps(st.session_state.project_info),
                       headers=headers)
 
 

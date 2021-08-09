@@ -7,7 +7,7 @@ from srcs.streamlit_app import app_utils, templates
 
 def add_and_display_label(labels: List[str]):
     """ An expander widgets to display labels and add label """
-    with st.beta_expander('Labels'):
+    with st.expander('Labels'):
         label_list_html = templates.label_list_html(labels)
         st.write(label_list_html, unsafe_allow_html=True)
         new_label = st.text_input('Define new label:')
@@ -15,73 +15,82 @@ def add_and_display_label(labels: List[str]):
     return new_label, _add
 
 
-def add_label(session_state) -> bool:
+def add_label() -> bool:
     """ An expander widget to add label. """
-    with st.beta_expander('Add label'):
+    with st.expander('Add label'):
         new_label = st.text_input('Define new label:')
         _add = st.button('Add', key='button_submit_define_label')
         if _add:
-            if new_label in session_state.project_info['label']:
+            if new_label in st.session_state.project_info['label']:
                 st.warning(f'The label "{new_label}" is already exist.')
             else:
-                session_state.project_info['label'].append(new_label)
+                st.session_state.project_info['label'].append(new_label)
                 return True
 
     return False
 
 
-def add_project(session_state):
+def add_project():
     """ An expander widgets to add new project """
-    with st.beta_expander('Add new project'):
+    def submit_add(project_name):
+        if project_name in st.session_state.projects:
+            st.warning(f'The name "{project_name}" is already exist.')
+        else:
+            app_utils.create_project(project_name)
+            st.session_state.projects.append(project_name)
+
+    with st.expander('Add new project'):
         new_project = st.text_input('New project name:',
                                     key='text_input_new_project_name')
-        _add = st.button('Add', key='button_submit_add_project')
-        if _add:
-            if new_project in session_state.projects:
-                st.warning(f'The name "{new_project}" is already exist.')
-            else:
-                app_utils.create_project(new_project)
-                session_state.projects.append(new_project)
+        st.button('Add', key='button_submit_add_project', on_click=submit_add,
+                  args=(new_project, ))
 
 
-def delete_label(session_state) -> bool:
+def delete_label() -> bool:
     """ An expander widget to delete a label. """
-    labels = session_state.project_info['label']
-    with st.beta_expander('Delete label'):
+    labels = st.session_state.project_info['label']
+    with st.expander('Delete label'):
         to_delete = st.selectbox('Delete a label:', ['- Select -'] + labels)
         if to_delete != '- Select -':
             _delete = st.button('Delete', key='button_submit_delete_label')
             if _delete:
-                session_state.project_info['label'].remove(to_delete)
+                st.session_state.project_info['label'].remove(to_delete)
                 return True
 
     return False
 
 
-def delete_project(session_state):
+def delete_project():
     """ Delete an existing project. """
-    if len(session_state.projects) > 0:
-        with st.beta_expander('Delete project'):
+    def submit_delete(project_name):
+        app_utils.delete_project(project_name)
+        st.session_state.projects.remove(project_name)
+
+    if len(st.session_state.projects) > 0:
+        with st.expander('Delete project'):
             project_to_delete = st.selectbox('Project to be deleted:',
-                                             session_state.projects)
-            _delete = st.button('Delete', key='button_submit_delete_project')
-            if _delete:
-                app_utils.delete_project(project_to_delete)
-                session_state.projects.remove(project_to_delete)
+                                             st.session_state.projects)
+            st.button('Delete', key='button_submit_delete_project',
+                      on_click=submit_delete, args=(project_to_delete, ))
 
 
-def export_data(session_state):
+def export_data():
     """
     An expander widget to export all data or just labeled data. This will return
     a streamlit placeholder to display download button after clicking the export
     button.
     """
-    project_name = session_state.current_project
+    def submit_export(data):
+        filename = f'{st.session_state.current_project}_{data}.csv'
+        csv = app_utils.download_csv(st.session_state.current_project, data)
+        st.session_state.download = (filename, csv)
+
+    project_name = st.session_state.current_project
     format_dict = {
         'labeled': 'Labeled data',
         'all': 'All data',
     }
-    with st.beta_expander('Export data'):
+    with st.expander('Export data'):
         all_or_labeled = st.radio('Export all data or just labeled data',
                                   list(format_dict.keys()),
                                   format_func=lambda x: format_dict[x],
@@ -90,15 +99,15 @@ def export_data(session_state):
         if export:
             filename = f'{project_name}_{all_or_labeled}.csv'
             csv = app_utils.download_csv(project_name, all_or_labeled)
-            session_state.download = (filename, csv)
+            st.session_state.download = (filename, csv)
 
-    return st.empty()
+        return st.empty()
 
 
-def label_data(session_state):
+def label_data():
     """ Checkboxes to label data. """
-    labels = session_state.project_info['label']
-    current_label = session_state.data['label']
+    labels = st.session_state.project_info['label']
+    current_label = st.session_state.data['label']
     st.write('')  # an empty line to make spacing
     checkboxes = []
     for label in labels:
@@ -117,7 +126,7 @@ def label_data(session_state):
 
 def import_data():
     """ An expander widget to import data. """
-    with st.beta_expander('Import data'):
+    with st.expander('Import data'):
         file = st.file_uploader(label='Upload your csv file here.')
         if file is not None:
             df = pd.read_csv(file)
@@ -131,9 +140,9 @@ def import_data():
     return file, _add, column
 
 
-def project_description(session_state) -> bool:
+def project_description() -> bool:
     """ Text area for displaying and changing the project description. """
-    description = session_state.project_info['description']
+    description = st.session_state.project_info['description']
     # project description text area height
     text_area_height = (len(description) + 42 - 1) // 42 * 30
     new_description = st.text_area('', value=description, height=text_area_height)
@@ -141,7 +150,7 @@ def project_description(session_state) -> bool:
     if new_description != description:
         add_description = st.button('Save', key='button_save_description')
         if add_description:
-            session_state.project_info['description'] = new_description
+            st.session_state.project_info['description'] = new_description
             return True
 
     return False
