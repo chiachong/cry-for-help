@@ -111,20 +111,21 @@ def main():
 
 def set_session_state():
     """ """
-    # default values
-    st.session_state.projects = []
-    st.session_state.current_page = 0
-    st.session_state.current_project = None
-    st.session_state.project_info = None
-    st.session_state.data = None
-    st.session_state.download = None
-    # other values
     para = st.experimental_get_query_params()
     # clicked next or previous page
     if 'page' in para.keys():
         st.experimental_set_query_params()
         new_page = max(1, int(para['page'][0])) - 1  # make sure the min is 0
         st.session_state.current_page = new_page
+
+    # default values
+    st.session_state.projects = []
+    st.session_state.current_project = None
+    st.session_state.project_info = None
+    st.session_state.data = None
+    st.session_state.download = None
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = 0
 
 
 if __name__ == '__main__':
