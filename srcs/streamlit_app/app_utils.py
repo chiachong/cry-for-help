@@ -109,7 +109,7 @@ def update_label_data(new_labels: List[str], url: str = None):
         url = os.environ['API_ADDRESS'] + os.environ['UPDATE_LABEL_DATA']
 
     url = f'{url}/{st.session_state.current_project}/{st.session_state.current_page}'
-    verified = str(datetime.now()).split('.')[0] if len(new_labels) > 0 else '0'
+    verified = str(datetime.now()).split('.')[0][:-3] if len(new_labels) > 0 else '0'
     data = {'new_labels': new_labels, 'verified': verified}
     # add new labels to unlabeled data
     if st.session_state.data['verified'] == '0':
