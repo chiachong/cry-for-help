@@ -110,9 +110,16 @@ def update_label_data(new_labels: List[str], url: str = None):
 
     url = f'{url}/{st.session_state.current_project}/{st.session_state.current_page}'
     verified = str(datetime.now()).split('.')[0] if len(new_labels) > 0 else '0'
-    progress_changes = 1 if len(new_labels) > 0 else -1
-    new_progress = f'{int(st.session_state.project_info["progress"]) + progress_changes}'
     data = {'new_labels': new_labels, 'verified': verified}
+    # add new labels to unlabeled data
+    if st.session_state.data['verified'] == '0':
+        new_progress = f'{int(st.session_state.project_info["progress"]) + 1}'
+    # remove all labels from labeled data
+    elif len(new_labels) == 0:
+        new_progress = f'{int(st.session_state.project_info["progress"]) - 1}'
+    # change labels of labeled data
+    else:
+        new_progress = st.session_state.project_info['progress']
 
     r = requests.put(url, data=json.dumps(data), headers=headers)
     # update label and progress status into session state
