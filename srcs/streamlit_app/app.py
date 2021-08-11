@@ -21,8 +21,13 @@ def main():
         if len(st.session_state.projects) == 0:
             project_holder.write('No available project. Please add a new project.')
         else:
+            try:
+                i = st.session_state.projects.index(st.session_state.current_project)
+            except ValueError:
+                i = 0
+
             st.session_state.current_project = project_holder.radio(
-                'Select a project to work with:', st.session_state.projects,
+                'Select a project to work with:', st.session_state.projects, i,
             )
 
     left_column, _, right_column = st.columns([50, 2, 20])
@@ -64,7 +69,7 @@ def main():
             data = app_utils.get_data()
             st.session_state.data = data
             if data['total'] > 0:
-                st.write(templates.page_number_html(current_page, data['total']),
+                st.write(templates.page_number_html(st.session_state.current_project, current_page, data['total']),
                          unsafe_allow_html=True)
                 st.write(templates.text_data_html(data['text']), unsafe_allow_html=True)
                 # display checkboxes for labeling
@@ -113,13 +118,17 @@ def set_session_state():
         st.experimental_set_query_params()
         new_page = max(1, int(para['page'][0])) - 1  # make sure the min is 0
         st.session_state.current_page = new_page
+    if 'project' in para.keys():
+        st.experimental_set_query_params()
+        st.session_state.current_project = para['project'][0]
 
     # default values
     st.session_state.projects = []
-    st.session_state.current_project = None
     st.session_state.project_info = None
     st.session_state.data = None
     st.session_state.download = None
+    if 'current_project' not in st.session_state:
+        st.session_state.current_project = None
     if 'current_page' not in st.session_state:
         st.session_state.current_page = 0
 

@@ -42,12 +42,13 @@ def create_date_html(date: str) -> str:
     """
 
 
-def page_number_html(current_page: int, total_page_number: int) -> str:
+def page_number_html(current_project: str, current_page: int,
+                     total_page_number: int) -> str:
     """ HTML scripts to display the page number. """
     current_page = min(total_page_number - 1, current_page)
     html = '<div style="text-align:center;margin-top:0.3em;margin-bottom:0.5em;">'
     if current_page > 0:
-        html += f'<a href="?page={current_page}" style="display:inline;">&lt</a>'
+        html += f'<a href="?project={current_project}&page={current_page}" style="display:inline;">&lt</a>'
 
     html += f"""
         <p style="display:inline;">
@@ -55,7 +56,7 @@ def page_number_html(current_page: int, total_page_number: int) -> str:
         </p>
     """
     if current_page < total_page_number - 1:
-        html += f'<a href="?page={current_page + 2}" style="display:inline;">&gt</a>'
+        html += f'<a href="?project={current_project}&page={current_page + 2}" style="display:inline;">&gt</a>'
 
     html += '</div>'
     return html
