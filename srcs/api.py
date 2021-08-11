@@ -58,7 +58,7 @@ def get_data(project_name: str, current_page: int):
         total = len(df)
         current_page = min(total - 1, current_page)
         text = df.texts.iloc[current_page]
-        verified = str(df.verified.iloc[current_page])
+        verified = str(df.verified.iloc[current_page])[:-3]
         label = str(df.label.iloc[current_page])
         label = [] if label == 'nan' else label.split(':sep:')
     except FileNotFoundError:
@@ -91,7 +91,7 @@ def get_project_info(project_name: str):
         progress = '0'
     return {
         'project': project_name,
-        'createDate': selected_df.createDate[0],
+        'createDate': selected_df.createDate[0][:-3],
         'description': selected_df.description[0],
         'label': label,
         'progress': progress,
