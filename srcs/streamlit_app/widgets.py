@@ -33,18 +33,19 @@ def add_label():
 
 def add_project():
     """ An expander widgets to add new project """
-    def submit_add(project_name):
+    def submit_add(expander, project_name):
         if project_name in st.session_state.projects:
-            st.warning(f'The name "{project_name}" is already exist.')
+            expander.warning(f'The name "{project_name}" is already exist.')
         else:
             app_utils.create_project(project_name)
             st.session_state.projects.append(project_name)
 
-    with st.expander('Add new project'):
+    expander = st.expander('Add new project')
+    with expander:
         new_project = st.text_input('New project name:',
                                     key='text_input_new_project_name')
         st.button('Add', key='button_submit_add_project', on_click=submit_add,
-                  args=(new_project, ))
+                  args=(expander, new_project, ))
 
 
 def delete_label():
