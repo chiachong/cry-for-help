@@ -15,19 +15,20 @@ def add_and_display_label(labels: List[str]):
     return new_label, _add
 
 
-def add_label() -> bool:
+def add_label():
     """ An expander widget to add label. """
-    with st.expander('Add label'):
-        new_label = st.text_input('Define new label:')
-        _add = st.button('Add', key='button_submit_define_label')
-        if _add:
-            if new_label in st.session_state.project_info['label']:
-                st.warning(f'The label "{new_label}" is already exist.')
-            else:
-                st.session_state.project_info['label'].append(new_label)
-                return True
+    def submit_add(expander, label):
+        if new_label in st.session_state.project_info['label']:
+            expander.warning(f'The label "{new_label}" is already exist.')
+        else:
+            st.session_state.project_info['label'].append(label)
+            app_utils.update_project_info()
 
-    return False
+    expander = st.expander('Add label')
+    with expander:
+        new_label = st.text_input('Define new label:')
+        st.button('Add', key='button_submit_define_label', on_click=submit_add,
+                  args=(expander, new_label, ))
 
 
 def add_project():
@@ -46,18 +47,18 @@ def add_project():
                   args=(new_project, ))
 
 
-def delete_label() -> bool:
+def delete_label():
     """ An expander widget to delete a label. """
-    labels = st.session_state.project_info['label']
-    with st.expander('Delete label'):
-        to_delete = st.selectbox('Delete a label:', ['- Select -'] + labels)
-        if to_delete != '- Select -':
-            _delete = st.button('Delete', key='button_submit_delete_label')
-            if _delete:
-                st.session_state.project_info['label'].remove(to_delete)
-                return True
+    def submit_delete(label):
+        st.session_state.project_info['label'].remove(label)
+        app_utils.update_project_info()
 
-    return False
+    labels = ['- Select -'] + st.session_state.project_info['label']
+    with st.expander('Delete label'):
+        to_delete = st.selectbox('Delete a label:', labels)
+        if to_delete != '- Select -':
+            st.button('Delete', key='button_submit_delete_label',
+                      on_click=submit_delete, args=(to_delete, ))
 
 
 def delete_project():
@@ -80,11 +81,6 @@ def export_data():
     a streamlit placeholder to display download button after clicking the export
     button.
     """
-    def submit_export(data):
-        filename = f'{st.session_state.current_project}_{data}.csv'
-        csv = app_utils.download_csv(st.session_state.current_project, data)
-        st.session_state.download = (filename, csv)
-
     project_name = st.session_state.current_project
     format_dict = {
         'labeled': 'Labeled data',
@@ -140,17 +136,17 @@ def import_data():
     return file, _add, column
 
 
-def project_description() -> bool:
+def project_description():
     """ Text area for displaying and changing the project description. """
+    def submit_save(text):
+        st.session_state.project_info['description'] = text
+        app_utils.update_project_info()
+
     description = st.session_state.project_info['description']
     # project description text area height
     text_area_height = (len(description) + 42 - 1) // 42 * 30
     new_description = st.text_area('', value=description, height=text_area_height)
     # display a button to save new description if the description is changed
     if new_description != description:
-        add_description = st.button('Save', key='button_save_description')
-        if add_description:
-            st.session_state.project_info['description'] = new_description
-            return True
-
-    return False
+        st.button('Save', key='button_save_description', on_click=submit_save,
+                  args=(new_description, ))

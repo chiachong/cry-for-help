@@ -39,20 +39,16 @@ def main():
             # display project creation datetime
             st.write(templates.create_date_html(st.session_state.project_info['createDate']),
                      unsafe_allow_html=True)
-            updates = []
             # project description text area
-            updates.append(widgets.project_description())
+            widgets.project_description()
             # placeholder to display the labelling progress
             progress_holder = st.empty()
             # placeholder to display list of labels
             label_list_holder = st.empty()
             # expander to add label
-            updates.append(widgets.add_label())
+            widgets.add_label()
             # expander to delete label
-            updates.append(widgets.delete_label())
-            # update description and labels
-            if any(updates):
-                app_utils.update_project_info()
+            widgets.delete_label()
 
             # import data
             file, add_data, text_column = widgets.import_data()
