@@ -21,7 +21,15 @@ api = Api(app)
 @app.route(f'{API_ENDPOINTS["ADD_DATA"]}/<project_name>', methods=['PUT'])
 @cross_origin()
 def add_text_data(project_name: str):
-    """ Add texts to be labelled. """
+    """
+    Add texts to be labelled. This api expects json data as follows:
+    {
+        'texts': List[str],
+    }
+
+    Args:
+        project_name (str): Project name.
+    """
     new_data = request.get_json()
     new_data['verified'] = ['0'] * len(new_data['texts'])
     new_data['label'] = None
@@ -33,7 +41,21 @@ def add_text_data(project_name: str):
 @app.route(f'{API_ENDPOINTS["DOWNLOAD_DATA"]}/<project_name>/<all_or_labeled>', methods=['GET'])
 @cross_origin()
 def download_data(project_name: str, all_or_labeled: str):
-    """ Download csv of all data or just labeled data. """
+    """
+    Download csv containing all data or just labeled data.
+
+    Args:
+        project_name (str): Project name.
+        all_or_labeled (str): Specify 'labeled' to download labeled data else
+                              all data will be downloaded.
+
+    Returns:
+        {
+            'text': Text data, List[str],
+            'verified': Verification datetime, List[str],
+            'label': Comma separated labels, List[str],
+        }
+    """
     df = pd.read_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'))
     if all_or_labeled == 'labeled':
         df = df[df['verified'] != '0']
@@ -52,7 +74,21 @@ def download_data(project_name: str, all_or_labeled: str):
 @app.route(f'{API_ENDPOINTS["GET_DATA"]}/<project_name>/<int:current_page>', methods=['GET'])
 @cross_origin()
 def get_data(project_name: str, current_page: int):
-    """ Get and return data and label in a dictionary. """
+    """
+    Get and return data, verification datetime and label in a dictionary.
+
+    Args:
+        project_name (str): Project name.
+        current_page (int): Current page index.
+
+    Returns:
+        {
+            'total': Total number of data in current project, int,
+            'text': Text data of the current page index, str,
+            'verified': Verification datetime of the current data, str,
+            'label': ":sep:" separated labels, str,
+        }
+    """
     try:
         df = pd.read_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'))
         total = len(df)
@@ -76,7 +112,21 @@ def get_data(project_name: str, current_page: int):
 @app.route(f'{API_ENDPOINTS["GET_PROJECT_INFO"]}/<project_name>', methods=['GET'])
 @cross_origin()
 def get_project_info(project_name: str):
-    """ Get and return project information in a dictionary. """
+    """
+    Get and return project information in a dictionary.
+
+    Args:
+        project_name (str): Project name.
+
+    Returns:
+        {
+            'project': Current project name, str,
+            'createDate': Project creation datetime, str,
+            'description': Project description, str,
+            'label': List of labels defined, List[str],
+            'progress': Number of labeled data in current project, str,
+        }
+    """
     df = pd.read_csv(os.path.join(PROJECT_DIR, 'projects.csv'))
     selected_df = df.loc[df.project == project_name].reset_index()
     label = selected_df.label[0]
@@ -101,7 +151,14 @@ def get_project_info(project_name: str):
 @app.route(API_ENDPOINTS['LOAD_PROJECTS'], methods=['GET'])
 @cross_origin()
 def get_all_projects():
-    """ Get and return list of projects. """
+    """
+    Get and return list of projects.
+
+    Returns:
+        {
+            'projects': List of project names, List[str]
+        }
+    """
     try:
         df = pd.read_csv(os.path.join(PROJECT_DIR, 'projects.csv'))
         projects = df.project.to_list()
@@ -114,7 +171,12 @@ def get_all_projects():
 @app.route(f'{API_ENDPOINTS["CREATE_PROJECT"]}/<project_name>', methods=['PUT'])
 @cross_origin()
 def create_project(project_name: str):
-    """ Get and return list of projects. """
+    """
+    Create a new project.
+
+    Args:
+        project_name (str): Project name.
+    """
     # create folder
     os.makedirs(os.path.join(PROJECT_DIR, project_name), exist_ok=True)
     # add project info
@@ -138,7 +200,12 @@ def create_project(project_name: str):
 @app.route(f'{API_ENDPOINTS["DELETE_PROJECT"]}/<project_name>', methods=['DELETE'])
 @cross_origin()
 def delete_project(project_name):
-    """ Delete an existing project. """
+    """
+    Delete an existing project.
+
+    Args:
+        project_name (str): Project name.
+    """
     # delete folder
     shutil.rmtree(os.path.join(PROJECT_DIR, project_name))
     # delete project info
@@ -151,7 +218,17 @@ def delete_project(project_name):
 @app.route(f'{API_ENDPOINTS["UPDATE_LABEL_DATA"]}/<project_name>/<int:current_page>', methods=['PUT'])
 @cross_origin()
 def update_label_data(project_name: str, current_page: int):
-    """ Update the labeled data. """
+    """
+    Update the labeled data. This api expects json data as follows:
+    {
+        'new_labels': List of labels, List[str],
+        'verified': Verification datetime, str,
+    }
+
+    Args:
+        project_name (str): Project name.
+        current_page (int): Current page index.
+    """
     new_labels = request.get_json()['new_labels']
     verified = request.get_json()['verified']
     df = pd.read_csv(os.path.join(PROJECT_DIR, project_name, 'data.csv'))
@@ -164,7 +241,18 @@ def update_label_data(project_name: str, current_page: int):
 @app.route(f'{API_ENDPOINTS["UPDATE_PROJECT_INFO"]}/<project_name>', methods=['POST'])
 @cross_origin()
 def update_project_info(project_name):
-    """ Update information of an existing project. """
+    """
+    Update information of an existing project. This api expects json data as follows:
+    {
+        'project': Project name, str,
+        'createDate': Project creation datetime, str,
+        'description': Project description, str,
+        'label': List of defined labels, List[str],
+    }
+
+    Args:
+        project_name (str): Project name.
+    """
     new_info = request.get_json()
     new_description = new_info['description']
     new_label = ':sep:'.join(new_info['label'])
