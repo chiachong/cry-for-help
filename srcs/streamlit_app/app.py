@@ -26,9 +26,18 @@ def main():
             except ValueError:
                 i = 0
 
-            st.session_state.current_project = project_holder.radio(
-                'Select a project to work with:', st.session_state.projects, i,
-            )
+            if st.session_state.get('switching_project', False):
+                current_project = project_holder.radio(
+                    'Select a project to work with:', st.session_state.projects,
+                    on_change=lambda: st.session_state.update({'switching_project': True})
+                )  # set switching project state to apply the changes
+                st.session_state.pop('switching_project')
+            else:
+                current_project = project_holder.radio(
+                    'Select a project to work with:', st.session_state.projects, i,
+                    on_change=lambda: st.session_state.update({'switching_project': True})
+                )  # set index to persist with the selected project during pagination
+            st.session_state.current_project = current_project
 
     left_column, _, right_column = st.columns([50, 2, 20])
     # display and update project info at the right column
