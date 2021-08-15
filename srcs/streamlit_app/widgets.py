@@ -1,22 +1,14 @@
 import pandas as pd
 import streamlit as st
-from typing import List
 
-from srcs.streamlit_app import app_utils, templates
-
-
-def add_and_display_label(labels: List[str]):
-    """ An expander widgets to display labels and add label """
-    with st.expander('Labels'):
-        label_list_html = templates.label_list_html(labels)
-        st.write(label_list_html, unsafe_allow_html=True)
-        new_label = st.text_input('Define new label:')
-        _add = st.button('Submit', key='button_submit_define_label')
-    return new_label, _add
+from srcs.streamlit_app import app_utils
 
 
 def add_label():
-    """ An expander widget to add label. """
+    """
+    An expander widget to add label. Enter new label in the text area then click
+    "Add" button to add the new label.
+    """
     def submit_add(expander, label):
         if new_label in st.session_state.project_info['label']:
             expander.warning(f'The label "{new_label}" is already exist.')
@@ -32,7 +24,10 @@ def add_label():
 
 
 def add_project():
-    """ An expander widgets to add new project """
+    """
+    An expander widget to add new project. Enter a new project name in the text
+    area then click "Add" button to add the new project.
+    """
     def submit_add(expander, project_name):
         if project_name in st.session_state.projects:
             expander.warning(f'The name "{project_name}" is already exist.')
@@ -49,7 +44,10 @@ def add_project():
 
 
 def delete_label():
-    """ An expander widget to delete a label. """
+    """
+    An expander widget to delete a label. Select a defined label from the drop
+    down list then click "Delete" button to delete the selected label.
+    """
     def submit_delete(label):
         st.session_state.project_info['label'].remove(label)
         app_utils.update_project_info()
@@ -63,7 +61,10 @@ def delete_label():
 
 
 def delete_project():
-    """ Delete an existing project. """
+    """
+    Delete an existing project. Select a project from the drop down list then
+    click "Delete" button to delete the selected project.
+    """
     def submit_delete(project_name):
         app_utils.delete_project(project_name)
         st.session_state.projects.remove(project_name)
@@ -78,7 +79,7 @@ def delete_project():
 
 def export_data():
     """
-    An expander widget to export all data or just labeled data. This will return
+    An expander widget to export all data or only labeled data. This will return
     a streamlit placeholder to display download button after clicking the export
     button.
     """
@@ -102,7 +103,10 @@ def export_data():
 
 
 def label_data():
-    """ Checkboxes to label data. """
+    """
+    Checkboxes to label data. Click or unclick a label to add or delete a label
+    then click the "Verify" button for verification.
+    """
     labels = st.session_state.project_info['label']
     current_label = st.session_state.data['label']
     st.write('')  # an empty line to make spacing
@@ -122,7 +126,11 @@ def label_data():
 
 
 def import_data():
-    """ An expander widget to import data. """
+    """
+    An expander widget to import data. Click to select file or drag a file into
+    the box then select a desired column containing the data and finally click
+    "Import" button to import the data to a project.
+    """
     with st.expander('Import data'):
         file = st.file_uploader(label='Upload your csv file here.')
         if file is not None:
@@ -138,7 +146,11 @@ def import_data():
 
 
 def project_description():
-    """ Text area for displaying and changing the project description. """
+    """
+    Text area for displaying and changing the project description. Click on the
+    text area to start modify the project description then press the Ctrl+Enter
+    buttons, after that click the "Save" button to save the project description.
+    """
     def submit_save(text):
         st.session_state.project_info['description'] = text
         app_utils.update_project_info()

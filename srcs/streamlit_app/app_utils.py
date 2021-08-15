@@ -12,7 +12,15 @@ from srcs import utils
 
 def add_texts(df: pd.DataFrame, add_data: bool, text_column: str,
               url: str = None):
-    """ Add text data. """
+    """
+    Send a put request to add text data to a project.
+
+    Args:
+        df (pd.DataFrame): Loaded csv.
+        add_data (bool): New data will be added if True (clicked "Import" button).
+        text_column (str): Name of the column containing text data.
+        url (str, optional): API address.
+    """
     headers = {
         'content-type': 'application/json',
         'Accept-Charset': 'UTF-8',
@@ -30,7 +38,13 @@ def add_texts(df: pd.DataFrame, add_data: bool, text_column: str,
 
 
 def create_project(project_name: str, url: str = None):
-    """ Create a new project """
+    """
+    Send a put request to create a new project.
+
+    Args:
+        project_name (str): Project name.
+        url (str, optional): API address.
+    """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['CREATE_PROJECT']
 
@@ -39,6 +53,13 @@ def create_project(project_name: str, url: str = None):
 
 
 def delete_project(project_name: str, url: str = None):
+    """
+    Send a delete request to delete an existing project.
+
+    Args:
+        project_name (str): Project name.
+        url (str, optional): API address.
+    """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['DELETE_PROJECT']
 
@@ -47,7 +68,15 @@ def delete_project(project_name: str, url: str = None):
 
 
 def download_csv(project_name: str, all_or_labeled: str, url: str = None):
-    """ Download csv of all data or just labeled data. """
+    """
+    Send a get request to download csv of all data or just labeled data.
+
+    Args:
+        project_name (str): Project name.
+        all_or_labeled (str): Set "labeled" to download labeled data or "all"
+                              to download all data.
+        url (str, optional): API address.
+    """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['DOWNLOAD_DATA']
 
@@ -60,7 +89,12 @@ def download_csv(project_name: str, all_or_labeled: str, url: str = None):
 
 
 def get_data(url: str = None):
-    """ Get data of the given project. """
+    """
+    Send a get request to get data of the current page index and project.
+
+    Args:
+        url (str, optional): API address.
+    """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['GET_DATA']
 
@@ -70,7 +104,12 @@ def get_data(url: str = None):
 
 
 def get_project_info(url: str = None):
-    """ Get information of the given project. """
+    """
+    Send a get request to fetch information of current project.
+
+    Args:
+        url (str, optional): API address.
+    """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['GET_PROJECT_INFO']
 
@@ -81,7 +120,12 @@ def get_project_info(url: str = None):
 
 @st.cache(show_spinner=False)
 def load_config(config: str):
-    """ Load project configurations from a .yaml file. """
+    """
+    Load project configurations from a .yaml file.
+
+    Args:
+        config (str): Path to the configuration file.
+    """
     config = utils.load_yaml(config)
     os.environ['PROJECT_DIR'] = config['PROJECT_DIR']
     os.environ['API_ADDRESS'] = config['API_ADDRESS']
@@ -91,7 +135,12 @@ def load_config(config: str):
 
 @st.cache(allow_output_mutation=True, show_spinner=False)
 def load_projects(url: str = None) -> List[str]:
-    """ Load list of available projects. """
+    """
+    Send a get request to load list of available projects.
+
+    Args:
+        url (str, optional): API address.
+    """
     if url is None:
         url = os.environ['API_ADDRESS'] + os.environ['LOAD_PROJECTS']
 
@@ -100,7 +149,13 @@ def load_projects(url: str = None) -> List[str]:
 
 
 def update_label_data(new_labels: List[str], url: str = None):
-    """ Update the labels of the labeled data. """
+    """
+    Send a put request to update the labels of the labeled data.
+
+    Args:
+        new_labels (List[str]): List of selected labels.
+        url (str, optional): API address.
+    """
     headers = {
         'content-type': 'application/json',
         'Accept-Charset': 'UTF-8',
@@ -129,7 +184,12 @@ def update_label_data(new_labels: List[str], url: str = None):
 
 
 def update_project_info(url: str = None):
-    """ Update project description and labels. """
+    """
+    Send a post request to update project description and labels.
+
+    Args:
+        url (str, optional): API address.
+    """
     headers = {
         'content-type': 'application/json',
         'Accept-Charset': 'UTF-8',
