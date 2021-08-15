@@ -68,6 +68,9 @@ def delete_project():
     def submit_delete(project_name):
         app_utils.delete_project(project_name)
         st.session_state.projects.remove(project_name)
+        # set current project to None if it is deleted
+        if st.session_state.current_project == project_name:
+            st.session_state.current_project = None
 
     if len(st.session_state.projects) > 0:
         with st.expander('Delete project'):
