@@ -3,7 +3,7 @@ import streamlit as st
 from srcs.streamlit_app import app_utils, templates, widgets
 
 CONFIG = './config.yaml'
-st.set_page_config(page_title='labelStream', layout='wide')
+st.set_page_config(page_title='Cry for Help', layout='wide')
 
 
 def main():
@@ -26,6 +26,7 @@ def main():
             except ValueError:
                 i = 0
 
+            # ignore index if switching project (change radio button)
             if st.session_state.get('switching_project', False):
                 current_project = project_holder.radio(
                     'Select a project to work with:', st.session_state.projects,
