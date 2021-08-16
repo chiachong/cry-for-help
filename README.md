@@ -1,4 +1,5 @@
 Data labelling tool using Streamlit. So far the app only support labelling of text classification data.
+![Streamlit app](streamlit_app.gif)
 
 ## Table of Contents
 * [Prepare Environments](#prepare-environments)
