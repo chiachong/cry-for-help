@@ -133,10 +133,14 @@ def set_session_state():
         st.session_state.current_project = para['project'][0]
 
     # default values
-    st.session_state.projects = []
-    st.session_state.project_info = None
-    st.session_state.data = None
-    st.session_state.download = None
+    if 'projects' not in st.session_state:
+        st.session_state.projects = []
+    if 'project_info' not in st.session_state:
+        st.session_state.project_info = None
+    if 'data' not in st.session_state:
+        st.session_state.data = None
+    if 'download' not in st.session_state:
+        st.session_state.download = None
     if 'current_project' not in st.session_state:
         st.session_state.current_project = None
     if 'current_page' not in st.session_state:
