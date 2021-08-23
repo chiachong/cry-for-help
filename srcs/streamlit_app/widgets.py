@@ -110,6 +110,9 @@ def label_data():
     Checkboxes to label data. Click or unclick a label to add or delete a label
     then click the "Verify" button for verification.
     """
+    def submit_verify(updates):
+        app_utils.update_label_data(updates)
+
     labels = st.session_state.project_info['label']
     current_label = st.session_state.data['label']
     st.write('')  # an empty line to make spacing
@@ -122,10 +125,8 @@ def label_data():
     new_labels = [labels[i] for i in range(len(labels)) if checkboxes[i]]
     # display a submit button if any label checkboxes is changed
     if set(new_labels) != set(current_label):
-        verify = st.button('Verify', key='button_submit_label_data')
-    else:
-        verify = None
-    return new_labels, verify
+        st.button('Verify', key='button_submit_label_data',
+                  on_click=submit_verify, args=(new_labels, ))
 
 
 def import_data():

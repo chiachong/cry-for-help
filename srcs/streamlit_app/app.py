@@ -84,9 +84,7 @@ def main():
                 st.write(templates.text_data_html(data['text']), unsafe_allow_html=True)
                 # display checkboxes for labeling
                 if len(st.session_state.project_info['label']) > 0:
-                    new_labels, verify_label = widgets.label_data()
-                    if verify_label:
-                        app_utils.update_label_data(new_labels)
+                    widgets.label_data()
                 else:
                     st.write(templates.no_label_html(), unsafe_allow_html=True)
                 # display the verification datetime
